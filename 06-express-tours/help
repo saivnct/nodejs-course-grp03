@@ -1,0 +1,8 @@
+#init project
+npm init
+
+#install nodemon for dev purpose
+npm install nodemon --save-dev
+
+#install express.js
+npm install express@4
