@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 
 
-app.get('/',(req, res) => {
+const indexHandler = (req, res) => {
     // res
     //     .status(200)
     //     .send('Hello from server !!!');
@@ -16,22 +16,31 @@ app.get('/',(req, res) => {
     res
         .status(200)
         .json(person);
-});
+}
 
-
-app.get('/getAllTours',(req, res) => {
+const getAllToursHanlder = (req, res) => {
     res
         .status(200)
         .send('getAllTours');
-});
+}
 
-app.get('/getTourById/:id',(req, res) => {
+const getTourById = (req, res) => {
     console.log(req.params);
 
     res
         .status(200)
         .send('getTourById');
-});
+}
+
+
+
+
+
+app.get('/',indexHandler);
+
+app.get('/getAllTours',getAllToursHanlder);
+
+app.get('/getTourById/:id',getTourById);
 
 
 
