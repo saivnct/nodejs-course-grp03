@@ -1,0 +1,11 @@
+# init a nodejs project
+npm init
+
+#install a dependency
+npm install express
+
+#install a dependency only for development purpose
+npm install nodemon --save-dev
+
+#remove a dependency from project
+npm rm express
