@@ -30,12 +30,8 @@ const getAllTourHandler = (req,res) => {
         })
 }
 
-app.get('/', indexHandler);
-app.get('/getAllTour', getAllTourHandler);
-
-
-app.get('/getTourById/:id',(req,res) => {
-   // console.log(req.params);
+const getTourByIdHandler = (req,res) => {
+    // console.log(req.params);
     const id = req.params.id * 1;
     const dataGet = dataArr[id];
     console.log('Data get by Id',dataGet);
@@ -46,10 +42,9 @@ app.get('/getTourById/:id',(req,res) => {
             msg: `Get tour by Id successfully!`,
             data: dataGet
         })
-});
+}
 
-
-app.get('/deleteById/:id',(req,res) => {
+const deleteByIdHandler = (req,res) => {
     console.log('Id delete', req.params.id);
     const id = req.params.id*1;
 
@@ -75,9 +70,9 @@ app.get('/deleteById/:id',(req,res) => {
                 msg: `Not found tour with ${id}!`
             })
     }
-})
+}
 
-app.post('/createNewTour',(req,res) => {
+const createNewTourHandler = (req,res) => {
     console.log('createNewTour', req.body);
     const newData = req.body;
     dataArr.push(newData)
@@ -101,7 +96,12 @@ app.post('/createNewTour',(req,res) => {
         }
 
     });
-})
+}
+app.get('/', indexHandler);
+app.get('/getAllTour', getAllTourHandler);
+app.get('/getTourById/:id', getTourByIdHandler);
+app.get('/deleteById/:id', deleteByIdHandler);
+app.post('/createNewTour', createNewTourHandler);
 
 
 app.listen(9000,() => {
