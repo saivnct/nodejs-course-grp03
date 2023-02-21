@@ -8,22 +8,27 @@ const dataArr = JSON.parse(data);
 app.use(express.json());
 
 app.get('/',(req, res) => {
-    // res
-    //     .status(200)
-    //     .send('Hello form server :<');
-
-    let person = {
-        name: 'va',
-        age: 23
-    }
-    res.status(200).json(person);
+    res
+        .status(200)
+        .json({
+            code: 200,
+            msg: 'OK'
+        })
 })
 
 app.get('/getAllTour',(req,res) => {
     res
         .status(200)
-        .send(dataArr)
+        .json({
+            code: 200,
+            msg: 'OK',
+            data: {
+                tours: dataArr
+            }
+        })
 });
+
+
 app.get('/getTourById/:id',(req,res) => {
    // console.log(req.params);
     const id = req.params.id * 1;
@@ -31,8 +36,10 @@ app.get('/getTourById/:id',(req,res) => {
     console.log('Data get by Id',dataGet);
     res
         .status(200)
-        .send(dataGet)
+        .json(dataGet)
 });
+
+
 app.get('/deleteById/:id',(req,res) => {
     console.log('Id delete', req.params.id);
     const id = req.params.id*1;
@@ -41,15 +48,26 @@ app.get('/deleteById/:id',(req,res) => {
     if (index >= 0){
         const dataDel = dataArr[index];
         dataArr.splice(index,1);
-        fs.writeFileSync('./dev-data/data/tours-simple.json', JSON.stringify(dataArr));
         console.log('Data delete by Id',dataDel);
+
+        fs.writeFile('./dev-data/data/tours-simple.json', JSON.stringify(dataArr) , (err) => {
+            res
+                .status(200)
+                .json({
+                    code: 200,
+                    msg: `Delete id: ${id} successfully!`
+                });
+        })
+    }else{
+        res
+            .status(404)
+            .json({
+                code: 404,
+                msg: `Not found tour with ${id}!`
+            })
     }
-
-    res
-        .status(200)
-        .send(`Delete id: ${id} successfully!`)
-
 })
+
 app.post('/createNewTour',(req,res) => {
     console.log('createNewTour', req.body);
     const newData = req.body;
