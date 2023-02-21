@@ -39,7 +39,7 @@ app.get('/deleteById/:id',(req,res) => {
     // console.log('Id delete', req.params.id);
     const id = req.params.id*1;
     const dataDel = dataArr[id];
-    delete dataArr[id];
+    dataArr.splice(id,1);
     fs.writeFileSync('./dev-data/data/tours-simple.json', JSON.stringify(dataArr))
     console.log('Data delete by Id',dataDel);
     console.log('Data get by Id',dataArr);
@@ -50,10 +50,12 @@ app.get('/deleteById/:id',(req,res) => {
 })
 app.post('/createNewTour',(req,res) => {
     console.log('createNewTour', req.body);
-
+    const newData = req.body;
+    dataArr.push(newData)
+    fs.writeFileSync('./dev-data/data/tours-simple.json', JSON.stringify(dataArr))
     res
         .status(200)
-        .send(`OK`)
+        .send(`Add new tour successfully!`)
 
 })
 
