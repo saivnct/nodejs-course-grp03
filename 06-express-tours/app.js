@@ -22,8 +22,8 @@ app.get('/getAllTour',(req,res) => {
         .send(dataArr)
 });
 app.get('/getTourById/:id',(req,res) => {
-//    console.log(req.params.id);
-    const id = req.params.id;
+   // console.log(req.params);
+    const id = req.params.id * 1;
     const dataGet = dataArr[id];
     console.log('Data get by Id',dataGet);
     res
@@ -31,8 +31,8 @@ app.get('/getTourById/:id',(req,res) => {
         .send(dataGet)
 });
 app.get('/deleteById/:id',(req,res) => {
-    console.log('Id delete', req.params.id);
-    const id = req.params.id;
+    // console.log('Id delete', req.params.id);
+    const id = req.params.id*1;
     const dataDel = dataArr[id];
     delete dataArr[id];
     fs.writeFileSync('./dev-data/data/tours-simple.json', JSON.stringify(dataArr))
