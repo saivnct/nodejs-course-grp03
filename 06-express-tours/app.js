@@ -7,8 +7,6 @@ const dataArr = JSON.parse(data);
 //using express.json middleware -> stand between req and response
 app.use(express.json());
 
-
-
 app.get('/',(req, res) => {
     // res
     //     .status(200)
@@ -36,13 +34,17 @@ app.get('/getTourById/:id',(req,res) => {
         .send(dataGet)
 });
 app.get('/deleteById/:id',(req,res) => {
-    // console.log('Id delete', req.params.id);
+    console.log('Id delete', req.params.id);
     const id = req.params.id*1;
-    const dataDel = dataArr[id];
-    dataArr.splice(id,1);
-    fs.writeFileSync('./dev-data/data/tours-simple.json', JSON.stringify(dataArr))
-    console.log('Data delete by Id',dataDel);
-    console.log('Data get by Id',dataArr);
+
+    const index = dataArr.findIndex((tour) => {return tour.id === id});
+    if (index >= 0){
+        const dataDel = dataArr[index];
+        dataArr.splice(index,1);
+        fs.writeFileSync('./dev-data/data/tours-simple.json', JSON.stringify(dataArr));
+        console.log('Data delete by Id',dataDel);
+    }
+
     res
         .status(200)
         .send(`Delete id: ${id} successfully!`)
