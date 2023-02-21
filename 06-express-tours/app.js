@@ -4,6 +4,11 @@ const app = express();
 const data = fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`,'utf-8')
 const dataArr = JSON.parse(data);
 
+//using express.json middleware -> stand between req and response
+app.use(express.json());
+
+
+
 app.get('/',(req, res) => {
     // res
     //     .status(200)
@@ -43,6 +48,16 @@ app.get('/deleteById/:id',(req,res) => {
         .send(`Delete id: ${id} successfully!`)
 
 })
+app.post('/createNewTour',(req,res) => {
+    console.log('createNewTour', req.body);
+
+    res
+        .status(200)
+        .send(`OK`)
+
+})
+
+
 app.listen(9000,() => {
     console.log('App running on port 9000...');
 });
