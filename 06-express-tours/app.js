@@ -36,7 +36,11 @@ app.get('/getTourById/:id',(req,res) => {
     console.log('Data get by Id',dataGet);
     res
         .status(200)
-        .json(dataGet)
+        .json({
+            code: 200,
+            msg: `Get tour by Id successfully!`,
+            data: dataGet
+        })
 });
 
 
@@ -72,11 +76,26 @@ app.post('/createNewTour',(req,res) => {
     console.log('createNewTour', req.body);
     const newData = req.body;
     dataArr.push(newData)
-    fs.writeFileSync('./dev-data/data/tours-simple.json', JSON.stringify(dataArr))
-    res
-        .status(200)
-        .send(`Add new tour successfully!`)
 
+    fs.writeFile('./dev-data/data/tours-simple.json', JSON.stringify(dataArr), (err) => {
+        if(!err) {
+            res
+                .status(201)
+                .json({
+                    code: 201,
+                    msg: `Add new tour successfully!`,
+                    data: newData
+                });
+        } else {
+            res
+                .status(500)
+                .json({
+                    code: 500,
+                    msg: `Add new tour fail!`
+                });
+        }
+
+    });
 })
 
 
