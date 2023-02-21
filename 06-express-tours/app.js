@@ -97,11 +97,14 @@ const createNewTourHandler = (req,res) => {
 
     });
 }
+
+
+
 app.get('/', indexHandler);
-app.get('/getAllTour', getAllTourHandler);
-app.get('/getTourById/:id', getTourByIdHandler);
-app.get('/deleteById/:id', deleteByIdHandler);
-app.post('/createNewTour', createNewTourHandler);
+app.get('/tours', getAllTourHandler);
+app.get('/tours/:id', getTourByIdHandler);
+app.delete('/tours/:id', deleteByIdHandler);
+app.post('/tours', createNewTourHandler);
 
 
 app.listen(9000,() => {
