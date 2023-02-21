@@ -1,8 +1,4 @@
-#init project
-npm init
-
-#install nodemon for dev purpose
+#auto update
 npm install nodemon --save-dev
-
-#install express.js
+# Minimal node.js framework
 npm install express@4
