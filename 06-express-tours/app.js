@@ -7,16 +7,18 @@ const dataArr = JSON.parse(data);
 //using express.json middleware -> stand between req and response
 app.use(express.json());
 
-app.get('/',(req, res) => {
+
+const indexHandler =  (req, res) => {
     res
         .status(200)
         .json({
             code: 200,
             msg: 'OK'
         })
-})
+};
 
-app.get('/getAllTour',(req,res) => {
+
+const getAllTourHandler = (req,res) => {
     res
         .status(200)
         .json({
@@ -26,7 +28,10 @@ app.get('/getAllTour',(req,res) => {
                 tours: dataArr
             }
         })
-});
+}
+
+app.get('/', indexHandler);
+app.get('/getAllTour', getAllTourHandler);
 
 
 app.get('/getTourById/:id',(req,res) => {
