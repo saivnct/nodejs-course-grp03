@@ -5,11 +5,20 @@ const app = express();
 //using express.json middleware -> stand between req and response
 app.use(express.json());
 
+//custom middleware 1
+app.use((req,res,next) => {
+    req.abc = 10000;
+    console.log('Hello from middleware!!!');
+    next();
+})
+
+
+//custom middleware 2
+
 
 
 //method 3: mouting the router on a route
 const tourRouter = require('./routes/tour');
-
 app.use('/api/v1/tours', tourRouter);
 
 

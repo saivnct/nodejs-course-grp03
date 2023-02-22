@@ -3,7 +3,9 @@ const data = fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`,'
 const dataArr = JSON.parse(data);
 
 
-exports.getAllTour = (req,res) => {
+exports.getAllTour = (req,res,next) => {
+    console.log(req.abc);
+
     res
         .status(200)
         .json({
