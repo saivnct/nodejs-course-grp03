@@ -138,6 +138,10 @@ app.route('/api/v1/tours')
     .get(getAllTourHandler)
     .post(createNewTourHandler);
 
+app.route('/api/v1/tours/:id')
+    .get(getTourByIdHandler)
+    .delete(deleteByIdHandler)
+    .patch(updateTourByIdHandler);
 
 
 
