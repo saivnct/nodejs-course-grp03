@@ -98,6 +98,34 @@ const createNewTourHandler = (req,res) => {
     });
 }
 
+const updateTourByIdHandler = (req, res) => {
+    console.log('Id update', req.params.id);
+    const id = req.params.id * 1;
+    const updateInfo = req.body;
+    const index = dataArr.findIndex((tour) => {return tour.id === id});
+    if (index >= 0){
+        const dataUpdate = dataArr[index];
+
+        console.log('Data update by Id',dataUpdate);
+
+        fs.writeFile('./dev-data/data/tours-simple.json', JSON.stringify(dataArr) , (err) => {
+            res
+                .status(200)
+                .json({
+                    code: 200,
+                    msg: `Update id: ${id} successfully!`
+                });
+        })
+    }else{
+        res
+            .status(404)
+            .json({
+                code: 404,
+                msg: `Not found tour with ${id}!`
+            })
+    }
+}
+
 
 
 app.get('/', indexHandler);
@@ -105,7 +133,7 @@ app.get('/tours', getAllTourHandler);
 app.get('/tours/:id', getTourByIdHandler);
 app.delete('/tours/:id', deleteByIdHandler);
 app.post('/tours', createNewTourHandler);
-
+app.patch('/tour/:id',updateTourByIdHandler);
 
 app.listen(9000,() => {
     console.log('App running on port 9000...');
