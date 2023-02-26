@@ -8,8 +8,8 @@ go
 create table Tours(
     id int identity (1,1) primary key not null ,
     name varchar(200) not null unique,
-    rating float default 4.5 CHECK (Rating >= 0 AND Rating <= 5),
-    price int not null CHECK (Price >= 0),
+    rating float default 4.5 CHECK (rating >= 0 AND rating <= 5),
+    price int not null CHECK (price >= 0),
 )
 
 -- DROP table
