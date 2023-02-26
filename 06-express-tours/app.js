@@ -9,11 +9,10 @@ app.use(express.json());
 
 //method 3: mouting the router on a route
 const tourRouter = require('./routes/tour');
+const userRouter = require('./routes/user');
 
 app.use('/api/v1/tours', tourRouter);
-
-
-
+app.use('/api/v1/users', userRouter);
 
 //method 2: combine same routes but different handlers
 // app.route('/api/v1/tours')
@@ -33,12 +32,6 @@ app.use('/api/v1/tours', tourRouter);
 // app.get('/api/v1/tours/:id', getTourByIdHandler);
 // app.delete('/api/v1/tours/:id', deleteByIdHandler);
 // app.patch('/api/v1/tours/:id',updateTourByIdHandler);
-
-
-
-
-
-
 app.listen(9000,() => {
     console.log('App running on port 9000...');
 });
