@@ -1,5 +1,5 @@
 const fs = require('fs');
-const data = fs.readFileSync(`${--__dirname}/../dev-data/data/users.json`,'utf-8');
+const data = fs.readFileSync(`${__dirname}/../dev-data/data/users.json`,'utf-8');
 const userArr = JSON.parse(data);
 
 exports.getAllUser = (req, res) => {

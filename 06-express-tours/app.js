@@ -1,9 +1,28 @@
+const dotenv = require('dotenv');
 const express = require('express');
+const morgan = require('morgan');
 const app = express();
+
+dotenv.config({
+    path: './config.env'
+})
+
+//The order of middleware in stack is defined by the order they are defined in the code
+
+if (process.env.NODE_ENV === 'dev'){
+    //3RD-party MIDDLE WARE - HTTP request logger middleware
+    app.use(morgan('dev'));
+}
 
 
 //using express.json middleware -> stand between req and response
 app.use(express.json());
+
+app.use((req, res, next) => {
+    req.requestTime = new Date().toISOString();
+    // console.log("request Time:", req.requestTime);
+    next();
+});
 
 
 
@@ -32,6 +51,9 @@ app.use('/api/v1/users', userRouter);
 // app.get('/api/v1/tours/:id', getTourByIdHandler);
 // app.delete('/api/v1/tours/:id', deleteByIdHandler);
 // app.patch('/api/v1/tours/:id',updateTourByIdHandler);
-app.listen(9000,() => {
-    console.log('App running on port 9000...');
+
+//START SERVER
+const PORT = process.env.PORT;
+app.listen(PORT,() => {
+    console.log(`App running on port ${PORT}...`);
 });

@@ -6,3 +6,11 @@ npm install nodemon --save-dev
 
 #install express.js
 npm install express@4
+
+#install morgan - http logger
+npm install morgan
+
+
+#install dotenv - read environment variables
+npm install dotenv
+
