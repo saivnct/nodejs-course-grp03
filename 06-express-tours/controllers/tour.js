@@ -1,8 +1,33 @@
-const fs = require('fs');
-const data = fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`,'utf-8');
-const dataArr = JSON.parse(data);
 const TourDAO = require('./../DAO/TourDAO')
 
+exports.checkTourById = async (req, res, next, val) => {
+    console.log(`Tour id: ${val}`);
+
+    try{
+        const tour = await TourDAO.getTourById(val);
+
+        if (!tour){
+            return res
+                .status(404)    //NOT FOUND
+                .json({
+                    code: 404,
+                    msg: `Not found tour with Id ${val}!`,
+                });
+        }
+
+        req.tour = tour;
+    }catch (e) {
+        console.log(e);
+        return res
+            .status(500)
+            .json({
+                code: 500,
+                msg: e,
+            });
+    }
+
+    next();
+}
 
 exports.getAllTour = async (req,res) => {
     // console.log(req.requestTime);
@@ -47,13 +72,21 @@ exports.getAllTour = async (req,res) => {
     //     });
 }
 
-exports.getTourById = async  (req,res) => {
+exports.getTourById = async (req,res) => {
     // console.log(req.params);
-    const id = req.params.id * 1;
-
-    let tour;
     try{
-        tour = await TourDAO.getTourById(id)
+        const tour = req.tour;
+
+        res
+            .status(200)
+            .json({
+                code: 200,
+                msg: `Get tour by Id successfully!`,
+                data: {
+                    tour
+                }
+            })
+
     }catch (e){
         return res
             .status(500)
@@ -62,40 +95,20 @@ exports.getTourById = async  (req,res) => {
                 msg: e,
             })
     }
-
-
-    if (tour) {
-        res
-            .status(200)
-            .json({
-                code: 200,
-                msg: `Get tour by Id successfully!`,
-                data: tour
-            })
-    }else{
-        res
-            .status(404)    //NOT FOUND
-            .json({
-                code: 404,
-                msg: `Not found tour with Id ${id}!`,
-            })
-    }
-
-
-
 }
+
 exports.deleteById = async (req,res) => {
     const id = req.params.id*1;
-    let tour;
     try {
-        tour = await TourDAO.deleteTourById(id)
+        await TourDAO.deleteTourById(id)
         return res
             .status(200)
             .json({
                 code: 200,
-                msg: `Delete tour with ${Id} successfully!`,
+                msg: `Delete tour with ${id} successfully!`,
             })
     } catch (e) {
+        console.log(e);
         return res
             .status(500)
             .json({
@@ -107,18 +120,21 @@ exports.deleteById = async (req,res) => {
 
 exports.createNewTour = async (req,res) => {
     console.log('createNewTour', req.body);
-    const newData = req.body;
-    let tour;
+    const newTour = req.body;
     try {
-        tour = await TourDAO.createNewTour(newData)
+        await TourDAO.createNewTour(newTour);
+        const tour = await TourDAO.getTourByName(newTour.name);
         return res
             .status(200)
             .json({
                 code: 200,
                 msg: `Create new tour successfully!`,
-                tour
+                data: {
+                    tour
+                }
             })
     }catch (e){
+        console.log(e);
         res
             .status(500)
             .json({
@@ -131,28 +147,22 @@ exports.createNewTour = async (req,res) => {
 exports.updateTourById = async(req, res) => {
     console.log('Id update', req.params.id);
     const id = req.params.id * 1;
-    const updateInfo = req.body;
-    if (updateInfo.name){
-        const name = updateInfo.name;
-    }
-
-    if (typeof updateInfo.price === 'number' && updateInfo.price > 0){
-        let price = updateInfo.price;
-    }
-
-    if (typeof updateInfo.rating === 'number' && updateInfo.price > 0){
-        let rating = updateInfo.price;
-    }
     try {
-        tour = await TourDAO.updateTourById(id,updateInfo)
+        const updateInfo = req.body;
+
+        await TourDAO.updateTourById(id , updateInfo);
+        const tour = await TourDAO.getTourById(id);
         return res
             .status(200)
             .json({
                 code: 200,
                 msg: `Update id: ${id} successfully!`,
-                tour
+                data: {
+                    tour
+                }
             })
     }catch (e){
+        console.log(e);
         res
             .status(500)
             .json({
