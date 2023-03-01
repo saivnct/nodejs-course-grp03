@@ -123,3 +123,14 @@ exports.updateTourById = async (id, updateInfo) => {
     // console.log(result);
     return result.recordsets;
 }
+
+exports.clearAll = async () => {
+    if(!dbConfig.db.pool){
+        throw new Error('Not connected to db');
+    }
+
+    let result = await dbConfig.db.pool.request().query(`delete Tours`);
+
+    // console.log(result);
+    return result.recordsets;
+}

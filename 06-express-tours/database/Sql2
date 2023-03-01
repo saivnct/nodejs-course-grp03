@@ -1,20 +1,19 @@
 -- CREATE DB
-create database NaTours
+create database ToursDemo
 
 
 -- CREATE table
-use NaTours
+use ToursDemo
 go
-create table Tour(
-    id              int identity (1,1) primary key     not null,
+create table Tours(
+    id              int primary key     not null,
     name            varchar(200)                       not null unique,
     duration        int                                not null CHECK (duration >= 0),
     maxGroupSize    int                                not null CHECK (maxGroupSize >= 0),
     difficulty      varchar(10)                        not null,
-    ratingsAverage  float default 4.5 CHECK (RatingsAverage >= 0 AND ratingsAverage <= 5),
-    ratingsQuantity int default 0 CHECK (RatingsQuantity >= 0),
+    ratingsAverage  float default 4.5 CHECK (ratingsAverage >= 0 AND ratingsAverage <= 5),
+    ratingsQuantity int default 0 CHECK (ratingsQuantity >= 0),
     price           int                                not null CHECK (price >= 0),
-    priceDiscount   int CHECK (PriceDiscount >= 0),
     summary         varchar(max),
     description     varchar(max)                       not null,
     imageCover      varchar(200)                       not null,
@@ -22,36 +21,36 @@ create table Tour(
 )
 
 
-use NaTours
+use ToursDemo
 go
 create table TourImage
 (
-    tourId int foreign key references Tour(id) not null,
+    tourId int foreign key references Tours(id) not null,
     imgName varchar(200) not null,
 )
 
 
-use NaTours
+use ToursDemo
 go
 create table TourStartDate
 (
-    tourId int foreign key references Tour(id) not null,
+    tourId int foreign key references Tours(id) not null,
     date datetime not null,
 )
 
 
 
 -- insert data into table
-use NaTours
+use ToursDemo
 go
 insert into TourImage
     (tourId, imgName)
 SELECT
-    1, 'Img2'
-WHERE NOT EXISTS(SELECT * FROM TourImage WHERE tourId = 1 AND imgName = 'Img2')
+    1, 'Img1'
+WHERE NOT EXISTS(SELECT * FROM TourImage WHERE tourId = 1 AND imgName = 'Img1')
 
 
-use NaTours
+use ToursDemo
 go
 insert into TourStartDate
     (tourId, date)
@@ -60,39 +59,52 @@ SELECT
 WHERE NOT EXISTS(SELECT * FROM TourStartDate WHERE tourId = 1 AND date = '20120618 10:34:09 AM')
 
 
-
-use NaTours
+-- insert data into table Tours
+use ToursDemo
 go
-insert into Tour
-    (name, difficulty, duration, maxGroupSize, price, description, imageCover)
+insert into Tours
+    (id, name, difficulty, duration, maxGroupSize, price, description, imageCover)
 values
-    ('tour 1', 'medium', 10, 5, 10000, 'description', 'image')
+    (0,'tour 1', 'medium', 10, 5, 10000, 'description', 'image')
+
+
+-- insert data into table Tours if not existed
+use ToursDemo
+go
+insert into Tours
+    (id, name, difficulty, duration, maxGroupSize, price, description, imageCover)
+SELECT
+    0, 'tour 1', 'medium', 10, 5, 10000, 'description', 'image'
+WHERE NOT EXISTS(SELECT * FROM Tours WHERE id = 0)
 
 
 
 
 
 -- QUERY
-select * from Tour where duration >= 5 AND duration < 8 ORDER BY duration asc, maxGroupSize asc OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY;
+select * from Tours where duration >= 5 AND duration < 8 ORDER BY duration asc, maxGroupSize asc OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY;
 
-SELECT COUNT(DISTINCT id) as totalItem from Tour
+SELECT COUNT(DISTINCT id) as totalItem from Tours
 
 
-
+-- CLEAR table
+use ToursDemo
+go
+delete Tours
 
 
 
 -- DROP table
-use NaTours
+use ToursDemo
 go
-Drop table Tour
+Drop table Tours
 
 
-use NaTours
+use ToursDemo
 go
 Drop table TourImage
 
 
-use NaTours
+use ToursDemo
 go
 Drop table TourStartDate
