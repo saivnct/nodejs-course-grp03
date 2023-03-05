@@ -9,8 +9,8 @@ const dbConfig = require('./dbconfig');
 const appPool = new sql.ConnectionPool(dbConfig.sqlConfig);
 
 const fs = require('fs');
-const TourImageDAO = require('./../TourImageDAO');
-const TourStartDateDAO = require('./../TourStartDateDAO');
+const TourImageDAO = require('./../DAO/TourImageDAO');
+const TourStartDateDAO = require('./../DAO/TourStartDateDAO');
 const TourDAO = require('./../DAO/TourDAO');
 
 
@@ -27,38 +27,29 @@ async function importDB() {
     await TourDAO.addTourIfNotExisted(tour);
     let tourDB = await TourDAO.getTourById(tour.id);
     // console.log(tourDB);
+    if (!tourDB){
+        console.error(`cannot import tour with id ${tour.id}`)
+        continue;
+    }
 
-    if (tourDB) {
-      if (tour.images) {
-        for (let j = 0; j < tour.images.length; j++) {
-          await TourImageDAO.addTourImageIfNotExisted({
-              tourId: tour.id,
-              imgName: tour.images[j]
-            });
-        }
-      }
-
-      if (tour.startDates) {
-        for (let j = 0; j < tour.startDates.length; j++) {
-          let date = new Date(tour.startDates[j]);
-          await TourStartDateDAO.addTourStartDateIfNotExisted({
-                tourId: tour.id,
-                date: date.toISOString()
-              });
-        }
+    if (tour.images) {
+      for (let j = 0; j < tour.images.length; j++) {
+          await TourImageDAO.addTourImageIfNotExisted(tour.id, tour.images[j]);
       }
     }
-    
-    
+
+    if (tour.startDates) {
+      for (let j = 0; j < tour.startDates.length; j++) {
+          let date = new Date(tour.startDates[j]);
+          await TourStartDateDAO.addTourStartDateIfNotExisted(tour.id, date.toISOString());
+      }
+    }
   }
-
-
 }
 
 async function dbClean() {
   await TourImageDAO.clearAll();
   await TourStartDateDAO.clearAll();
-
   await TourDAO.clearAll();
 }
 
