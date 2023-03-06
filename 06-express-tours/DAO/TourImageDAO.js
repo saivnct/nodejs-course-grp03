@@ -21,7 +21,7 @@ exports.getByTourId = async (tourId) => {
     if (!dbConfig.db.pool) {
         throw new Error('Not connected to db');
     }
-    if (!tourId) {
+    if (typeof tourId !== 'number') {
         throw new Error('Invalid TourImage input param');
     }
     let request =  dbConfig.db.pool.request()
