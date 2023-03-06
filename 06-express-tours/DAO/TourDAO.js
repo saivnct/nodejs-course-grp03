@@ -134,3 +134,28 @@ exports.clearAll = async () => {
     // console.log(result);
     return result.recordsets;
 }
+
+exports.addTourIfNotExisted = async (tour) => {
+    if(!dbConfig.db.pool){
+        throw new Error('Not connected to db');
+    }
+    if (!tour) {
+        throw new Error('Invalid input param');
+    }
+    let request = dbConfig.db.pool.request()
+    let result = await request
+        .input('id', sql.Int, tour.id)
+        .input('name', sql.VarChar, tour.name)
+        .input('duration', sql.Int, tour.duration)
+        .input('maxGroupSize', sql.Int, tour.maxGroupSize)
+        .input('difficulty', sql.VarChar, tour.difficulty)
+        .input('ratingsAverage', sql.Float, tour.ratingsAverage)
+        .input('ratingsQuantity', sql.Int, tour.ratingsQuantity)
+        .input('price', sql.Int, tour.price)
+        .input('summary', sql.VarChar, tour.summary)
+        .input('description', sql.VarChar, tour.description)
+        .input('imageCover', sql.VarChar, tour.imageCover)
+        .query('insert into Tours (id, name, duration, maxGroupSize, difficulty, ratingsAverage, ratingsQuantity, price, summary, description, imageCover) SELECT @id, @name, @duration, @maxGroupSize, @difficulty, @ratingsAverage, @ratingsQuantity, @price, @summary, @description, @imageCover WHERE NOT EXISTS(SELECT * FROM Tours WHERE id = @id)');
+    console.log(result);
+    return result;
+}

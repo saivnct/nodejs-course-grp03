@@ -12,9 +12,6 @@ const fs = require('fs');
 const TourImageDAO = require('./../DAO/TourImageDAO');
 const TourStartDateDAO = require('./../DAO/TourStartDateDAO');
 const TourDAO = require('./../DAO/TourDAO');
-
-
-
 async function importDB() {
   const TOUR_FILE_PATH = `${__dirname}/../dev-data/data/tours-simple.json`;
   let tours = JSON.parse(fs.readFileSync(TOUR_FILE_PATH, 'utf-8'));
