@@ -78,6 +78,11 @@ SELECT
 WHERE NOT EXISTS(SELECT * FROM Tours WHERE id = 0)
 
 
+-- get last id of Tours
+use ToursDemo
+go
+SELECT MAX(id) as id FROM Tours
+
 
 
 

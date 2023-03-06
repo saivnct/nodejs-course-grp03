@@ -155,7 +155,10 @@ exports.addTourIfNotExisted = async (tour) => {
         .input('summary', sql.VarChar, tour.summary)
         .input('description', sql.VarChar, tour.description)
         .input('imageCover', sql.VarChar, tour.imageCover)
-        .query('insert into Tours (id, name, duration, maxGroupSize, difficulty, ratingsAverage, ratingsQuantity, price, summary, description, imageCover) SELECT @id, @name, @duration, @maxGroupSize, @difficulty, @ratingsAverage, @ratingsQuantity, @price, @summary, @description, @imageCover WHERE NOT EXISTS(SELECT * FROM Tours WHERE id = @id)');
-    console.log(result);
-    return result;
+        .query('insert into Tours ' +
+            '(id, name, duration, maxGroupSize, difficulty, ratingsAverage, ratingsQuantity, price, summary, description, imageCover) ' +
+            'SELECT @id, @name, @duration, @maxGroupSize, @difficulty, @ratingsAverage, @ratingsQuantity, @price, @summary, @description, @imageCover ' +
+            'WHERE NOT EXISTS(SELECT * FROM Tours WHERE id = @id)');
+    // console.log(result);
+    return result.recordsets;
 }

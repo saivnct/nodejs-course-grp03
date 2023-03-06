@@ -1,21 +1,18 @@
 const dbConfig = require('./../database/dbconfig');
 const sql = require('mssql');
 
-exports.addTourStartDateIfNotExisted = async (startDateInfo) => {
+exports.addTourStartDateIfNotExisted = async (tourId, date) => {
     if (!dbConfig.db.pool) {
         throw new Error('Not connected to db');
     }
-    if (!startDateInfo) {
-        throw new Error('Invalid startDateInfo input param');
-    }
-    let tourId = startDateInfo.tourId;
-    let date = startDateInfo.date;
 
     let request =  dbConfig.db.pool.request()
     let result = await request
         .input('tourId',sql.Int, tourId)
         .input('date', sql.Date, date)
-        .query('insert into TourStartDate (tourId, date) SELECT @tourId, @date WHERE NOT EXISTS(SELECT * FROM TourStartDate WHERE tourId = @tourId AND date = @date)')
+        .query('insert into TourStartDate (tourId, date) ' +
+            'SELECT @tourId, @date ' +
+            'WHERE NOT EXISTS(SELECT * FROM TourStartDate WHERE tourId = @tourId AND date = @date)')
     return result;
 }
 exports.getByTourId = async (tourId) => {

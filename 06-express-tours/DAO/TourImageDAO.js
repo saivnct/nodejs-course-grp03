@@ -1,20 +1,19 @@
 const dbConfig = require('./../database/dbconfig');
 const sql = require('mssql');
 
-exports.addTourImageIfNotExisted = async (imgInfo) => {
+exports.addTourImageIfNotExisted = async (tourId, imgName) => {
     if(!dbConfig.db.pool){
         throw new Error('Not connected to db');
     }
-    if (!imgInfo) {
-        throw new Error('Invalid imgInfo input param');
-    }
     let request = dbConfig.db.pool.request();
     let result = await request
-        .input('tourId', sql.Int, imgInfo.tourId)
-        .input('imgName', sql.VarChar, imgInfo.imgName)
-        .query('insert into TourImage (tourId, imgName) SELECT @tourId, @imgName WHERE NOT EXISTS(SELECT * FROM TourImage WHERE tourId = @tourId AND imgName = @imgName)');
+        .input('tourId', sql.Int, tourId)
+        .input('imgName', sql.VarChar, imgName)
+        .query('insert into TourImage (tourId, imgName) ' +
+            'SELECT @tourId, @imgName ' +
+            'WHERE NOT EXISTS(SELECT * FROM TourImage WHERE tourId = @tourId AND imgName = @imgName)');
 
-    console.log(result);
+    // console.log(result);
     return result.recordsets;
 }
 
