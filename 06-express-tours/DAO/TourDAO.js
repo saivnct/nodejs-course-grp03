@@ -14,8 +14,9 @@ exports.getAllTours = async () => {
     let result = await request.query('select * from Tours');
 
     // console.log(result);
-
-    return result.recordsets[0];
+    const tours = result.recordsets[0]
+    const tourIds = tours.map(i => i.id)
+    return tours;
 }
 
 exports.getTourById = async (id) => {
@@ -40,11 +41,11 @@ exports.getTourById = async (id) => {
     // }
     const images = tourImages.map(i => i.imgName);
     tour.images = images;
+    const startDates = tourStartDates.map(i => i.date);
+    tour.startDates = startDates;
 
-
-    console.log("images",images);
+    // console.log("images",images);
     // console.log("startDates",startDates);
-
     return tour;
 }
 
