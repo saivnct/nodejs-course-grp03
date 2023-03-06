@@ -1,5 +1,7 @@
 const dbConfig = require('./../database/dbconfig');
 const sql = require('mssql');
+const TourImageDAO = require('./TourImageDAO');
+const TourStartDateDAO = require('./TourStartDateDAO');
 
 
 exports.getAllTours = async () => {
@@ -16,7 +18,6 @@ exports.getAllTours = async () => {
     return result.recordsets[0];
 }
 
-
 exports.getTourById = async (id) => {
     if (!dbConfig.db.pool){
         throw new Error('Not connected to db');
@@ -28,9 +29,23 @@ exports.getTourById = async (id) => {
         .input('id', sql.Int, id)
         .query('select * from Tours where id = @id');
 
-    // console.log(result);
+    const tour = result.recordsets[0][0];
 
-    return result.recordsets[0][0];
+    const tourImages = await TourImageDAO.getByTourId(id);
+    const tourStartDates = await TourStartDateDAO.getByTourId(id);
+
+    // let images = [];
+    // for (let i = 0; i < tourImages.length; i++){
+    //     images.push(tourImages[i].imgName);
+    // }
+    const images = tourImages.map(i => i.imgName);
+    tour.images = images;
+
+
+    console.log("images",images);
+    // console.log("startDates",startDates);
+
+    return tour;
 }
 
 exports.getTourByName = async (name) => {

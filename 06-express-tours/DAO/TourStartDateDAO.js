@@ -26,7 +26,7 @@ exports.getByTourId = async (tourId) => {
     let result = await request
         .input('tourId',sql.Int, tourId)
         .query('select * from TourStartDate where tourId = @tourId')
-    return result.recordset;
+    return result.recordsets[0];
 }
 
 exports.clearAll = async () => {
