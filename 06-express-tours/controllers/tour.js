@@ -4,7 +4,7 @@ exports.checkTourById = async (req, res, next, val) => {
     console.log(`Tour id: ${val}`);
 
     try{
-        const tour = await TourDAO.getTourById(val);
+        const tour = await TourDAO.getTourById(val*1);
 
         if (!tour){
             return res
