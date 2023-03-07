@@ -1,4 +1,6 @@
 const TourDAO = require('./../DAO/TourDAO')
+const TourImageDAO = require('./../DAO/TourImageDAO')
+const TourStartDateDAO = require('./../DAO/TourStartDateDAO')
 
 exports.checkTourById = async (req, res, next, val) => {
     console.log(`Tour id: ${val}`);
@@ -27,29 +29,6 @@ exports.checkTourById = async (req, res, next, val) => {
     }
 
     next();
-}
-
-exports.checkLastId = async (req, res) => {
-    try{
-        const lastId = await TourDAO.checkLastId();
-
-        res
-            .status(200)
-            .json({
-                code: 200,
-                msg: 'OK',
-                data: {
-                    lastId
-                }
-            })
-    }catch (e) {
-        res
-            .status(500)
-            .json({
-                code: 500,
-                msg: e,
-            })
-    }
 }
 
 exports.getAllTour = async (req,res) => {
@@ -123,7 +102,7 @@ exports.getTourById = async (req,res) => {
 exports.deleteById = async (req,res) => {
     const id = req.params.id*1;
     try {
-        await TourDAO.deleteTourById(id)
+        await TourDAO.deleteTourById(id);
         return res
             .status(200)
             .json({
@@ -145,8 +124,26 @@ exports.createNewTour = async (req,res) => {
     console.log('createNewTour', req.body);
     const newTour = req.body;
     try {
+        const lastId = await TourDAO.checkLastId();
+        newTour.id = lastId + 1;
+
         await TourDAO.createNewTour(newTour);
-        const tour = await TourDAO.getTourByName(newTour.name);
+
+        if (newTour.images && newTour.images.length > 0){
+            for (let j = 0; j < newTour.images.length; j++) {
+                await TourImageDAO.addTourImageIfNotExisted(newTour.id, newTour.images[j]);
+            }
+        }
+
+        if (newTour.startDates && newTour.startDates.length > 0){
+            for (let j = 0; j < newTour.startDates.length; j++) {
+                let date = new Date(newTour.startDates[j]);
+                await TourStartDateDAO.addTourStartDateIfNotExisted(newTour.id, date.toISOString());
+            }
+        }
+
+
+        const tour = await TourDAO.getTourById(newTour.id);
         return res
             .status(200)
             .json({

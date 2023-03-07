@@ -18,11 +18,11 @@ exports.checkLastId = async () => {
         throw new Error('Not connected to db');
     }
 
-    let request = await dbConfig.db.pool.request()
+    let result = await dbConfig.db.pool.request()
         .query('SELECT MAX(id) as id FROM Tours');
 
-    console.log(request.recordsets[0]);
-    return request.recordsets[0]
+    console.log(result.recordsets[0][0].id);
+    return result.recordsets[0][0].id;
 }
 
 exports.getAllTours = async () => {
@@ -87,9 +87,7 @@ exports.deleteTourById = async (id) => {
     let request = dbConfig.db.pool.request();
     let result = await request
         .input('id', sql.Int, id)
-        .query('delete TourImage where id = @id')
-        .query('delete TourStartDate where id = @id')
-        .query('delete Tours where id = @id');
+        .query('delete Tours where id = @id')
 
     // console.log(result);
     return result.recordsets;
@@ -103,10 +101,10 @@ exports.createNewTour = async(tour) => {
     if (!tour){
         throw new Error('Invalid input param');
     }
-    let id = this.checkLastId + 1;
+
     let request = dbConfig.db.pool.request();
     let result = await request
-        .input('id', sql.Int, id)
+        .input('id', sql.Int, tour.id)
         .input('name', sql.VarChar, tour.name)
         .input('duration', sql.Int, tour.duration)
         .input('maxGroupSize', sql.Int, tour.maxGroupSize)
@@ -117,11 +115,12 @@ exports.createNewTour = async(tour) => {
         .input('summary', sql.VarChar, tour.summary)
         .input('description', sql.VarChar, tour.description)
         .input('imageCover', sql.VarChar, tour.imageCover)
-        .input('images', sql.VarChar, tour.images)
-        .input('startDates', sql.VarChar, tour.startDates)
-        .query('insert into Tours (id, name, duration, maxGroupSize, difficulty, ratingsAverage, ratingsQuantity, price, summary, description, imageCover) values (@id, @name, @duration, @maxGroupSize, @difficulty, @ratingsAverage, @ratingsQuantity, @price, @summary, @description, @imageCover)')
-        .query('insert into TourImage (tourId, images) values (@tourId, @images)')
-        .query('insert into TourStartDate (tourId, startDates) values (@tourId, @startDates)');
+        .query('insert into Tours ' +
+            '(id, name, duration, maxGroupSize, difficulty, ratingsAverage, ratingsQuantity, price, summary, description, imageCover) ' +
+            'values ' +
+            '(@id, @name, @duration, @maxGroupSize, @difficulty, @ratingsAverage, @ratingsQuantity, @price, @summary, @description, @imageCover)');
+
+
     console.log(result);
     return result.recordsets;
 }
