@@ -32,6 +32,8 @@ exports.checkTourById = async (req, res, next, val) => {
 }
 
 exports.getAllTour = async (req,res) => {
+    //TODO - implement pagination, sorting, filter !!!!
+
     // console.log(req.requestTime);
     try{
         const tours = await TourDAO.getAllTours();
