@@ -29,6 +29,29 @@ exports.checkTourById = async (req, res, next, val) => {
     next();
 }
 
+exports.checkLastId = async (req, res) => {
+    try{
+        const lastId = await TourDAO.checkLastId();
+
+        res
+            .status(200)
+            .json({
+                code: 200,
+                msg: 'OK',
+                data: {
+                    lastId
+                }
+            })
+    }catch (e) {
+        res
+            .status(500)
+            .json({
+                code: 500,
+                msg: e,
+            })
+    }
+}
+
 exports.getAllTour = async (req,res) => {
     // console.log(req.requestTime);
     try{
