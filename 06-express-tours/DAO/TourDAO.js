@@ -79,7 +79,6 @@ exports.getTourByName = async (name) => {
     return result.recordsets[0][0];
 }
 
-
 exports.deleteTourById = async (id) => {
     if(!dbConfig.db.pool){
         throw new Error('Not connected to db');

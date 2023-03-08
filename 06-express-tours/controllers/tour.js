@@ -104,6 +104,8 @@ exports.getTourById = async (req,res) => {
 exports.deleteById = async (req,res) => {
     const id = req.params.id*1;
     try {
+        await TourImageDAO.deleteTourImageById(id);
+        await TourStartDateDAO.deleteTourStartDateById(id);
         await TourDAO.deleteTourById(id);
         return res
             .status(200)

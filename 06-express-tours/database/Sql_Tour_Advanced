@@ -1,0 +1,150 @@
+use ToursDemo
+go
+SELECT * from Tours where duration <= 5 AND duration < 8 AND price < 500 AND difficulty LIKE 'easy' order by duration ASC, price DESC OFFSET 0 ROW FETCH FIRST 5 ROWS ONLY
+
+
+-- CREATE DB
+create database Tour_ad
+
+
+-- CREATE table
+use Tour_ad
+go
+create table ToursAd(
+    id              int primary key     not null,
+    name            varchar(200)                       not null unique,
+    duration        int                                not null CHECK (duration >= 0),
+    maxGroupSize    int                                not null CHECK (maxGroupSize >= 0),
+    difficulty      varchar(10)                        not null,
+    ratingsAverage  float default 4.5 CHECK (ratingsAverage >= 0 AND ratingsAverage <= 5),
+    ratingsQuantity int default 0 CHECK (ratingsQuantity >= 0),
+    price           int                                not null CHECK (price >= 0),
+    summary         varchar(max),
+    description     varchar(max)                       not null,
+    imageCover      varchar(200)                       not null,
+    createdAt       datetime default CURRENT_TIMESTAMP not null,
+)
+
+use Tour_ad
+go
+create table Guides
+(
+    guideId      int primary key      not null
+    guideName    varchar(200)         not null,
+)
+
+use Tour_ad
+go
+create table TourAdGuides
+(
+    tourId int foreign key references ToursAd(id) not null,
+    guideId int foreign key references Guides(guideId) not null,
+)
+
+
+use Tour_ad
+go
+create table TourAdStartDate
+(
+    tourId int foreign key references ToursAd(id) not null,
+    date datetime not null,
+)
+
+
+use Tour_ad
+go
+create table TourAdImage
+(
+    tourId int foreign key references ToursAd(id) not null,
+    imgName varchar(200) not null,
+)
+
+
+use Tour_ad
+go
+create table Locations(
+    locationId      int primary key     not null,
+    day             int                 not null unique,
+    description     varchar(200)        not null unique,
+    type            varchar(200)        not null,
+    coordinate_x    int                 not null,
+    coordinate_y    int                 not null,
+    address         varchar(200)
+)
+
+use Tour_ad
+go
+create table TourAdLocations
+(
+    tourId int foreign key references ToursAd(id) not null,
+    locationId int foreign key references Locations(locationId) not null,
+)
+
+-- INSERT DATA INTO TABLE -----------------------------------------
+
+
+-- insert data into table Tour_ad
+use Tour_ad
+go
+insert into ToTour_adurs
+    (id, name, difficulty, duration, maxGroupSize, price, description, imageCover)
+values
+    (0,'tour 1', 'medium', 10, 5, 10000, 'description', 'image')
+
+
+-- insert data into table Tours if not existed
+use Tour_ad
+go
+insert into Tours
+    (id, name, difficulty, duration, maxGroupSize, price, description, imageCover)
+SELECT
+    0, 'tour 1', 'medium', 10, 5, 10000, 'description', 'image'
+WHERE NOT EXISTS(SELECT * FROM Tours WHERE id = 0)
+
+
+use Tour_ad
+go
+insert into TourAdImage
+    (tourId, imgName)
+SELECT
+    1, 'Img1'
+WHERE NOT EXISTS(SELECT * FROM TourImage WHERE tourId = 1 AND imgName = 'Img1')
+
+
+use Tour_ad
+go
+insert into TourStartDate
+    (tourId, date)
+SELECT
+    1, '20120618 10:34:09 AM'
+WHERE NOT EXISTS(SELECT * FROM TourStartDate WHERE tourId = 1 AND date = '20120618 10:34:09 AM')
+
+
+
+-- get last id of Tours
+use Tour_ad
+go
+SELECT MAX(id) as id FROM Tours
+
+
+-- CLEAR table
+use Tour_ad
+go
+delete Tours
+
+
+
+-- DROP table
+use Tour_ad
+go
+Drop table Tours
+
+
+use Tour_ad
+go
+Drop table TourImage
+
+
+use Tour_ad
+go
+Drop table TourStartDate

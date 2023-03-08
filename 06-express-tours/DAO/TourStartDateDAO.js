@@ -28,7 +28,18 @@ exports.getByTourId = async (tourId) => {
         .query('select * from TourStartDate where tourId = @tourId')
     return result.recordsets[0];
 }
+exports.deleteTourStartDateById = async (id) => {
+    if(!dbConfig.db.pool){
+        throw new Error('Not connected to db');
+    }
+    let request = dbConfig.db.pool.request();
+    let result = await request
+        .input('id', sql.Int, id)
+        .query('delete TourStartDate where tourId = @id')
 
+    // console.log(result);
+    return result.recordsets;
+}
 exports.clearAll = async () => {
     if(!dbConfig.db.pool){
         throw new Error('Not connected to db');
