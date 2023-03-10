@@ -32,21 +32,36 @@ exports.checkTourById = async (req, res, next, val) => {
 }
 
 exports.getAllTour = async (req,res) => {
-    //TODO - implement pagination, sorting, filter !!!!
 
-    // console.log(req.requestTime);
+
     try{
-        const tours = await TourDAO.getAllTours();
+        // const tours = await TourDAO.getAllTours();
+        // res
+        //     .status(200)
+        //     .json({
+        //         code: 200,
+        //         msg: 'OK',
+        //         data: {
+        //             tours
+        //         }
+        //     })
 
-        res
-            .status(200)
-            .json({
-                code: 200,
-                msg: 'OK',
-                data: {
-                    tours
-                }
-            })
+
+        //implement pagination, sorting, filter !!!!
+        console.log(req.query);
+        const {page,pageSize,totalPage,totalItem,tours} = await TourDAO.getAllTours(req.query);
+        // console.log(tours);
+        res.status(200).json({
+            //200 - OK
+            status: 'success',
+            page,
+            pageSize,
+            totalPage,
+            totalItem,
+            data: {
+                tours
+            },
+        });
     }catch (e) {
         res
             .status(500)
@@ -56,24 +71,6 @@ exports.getAllTour = async (req,res) => {
             })
     }
 
-
-    // TourDAO.getAllTours()
-    //     .then((tours) => {
-    //         console.log(tours);
-    //
-    //         res
-    //             .status(200)
-    //             .json({
-    //                 code: 200,
-    //                 msg: 'OK',
-    //                 data: {
-    //                     tours
-    //                 }
-    //             })
-    //     })
-    //     .catch((err) => {
-    //         console.error(err);
-    //     });
 }
 
 exports.getTourById = async (req,res) => {
