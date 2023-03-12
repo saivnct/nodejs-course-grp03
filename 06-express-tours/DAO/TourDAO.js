@@ -13,40 +13,7 @@ async function setTourInfo(tour){
     return tour
 }
 
-exports.checkLastId = async () => {
-    if (!dbConfig.db.pool){
-        throw new Error('Not connected to db');
-    }
 
-    let result = await dbConfig.db.pool.request()
-        .query('SELECT MAX(id) as id FROM Tours');
-
-    console.log(result.recordsets[0][0].id);
-    return result.recordsets[0][0].id;
-}
-
-// exports.getAllTours = async () => {
-//     if (!dbConfig.db.pool){
-//         throw new Error('Not connected to db');
-//     }
-//
-//     let request = dbConfig.db.pool.request();
-//
-//     let result = await request.query('select * from Tours');
-//
-//     let tours = result.recordsets[0];
-//
-//     //solution 1 - processing with map & promise
-//     tours = tours.map(async (t) => {return await setTourInfo(t)})
-//     tours = await Promise.all(tours);
-//
-//     //solution 2 - basic for loop
-//     // for (let i = 0; i < tours.length; i++){
-//     //     await setTourInfo(tours[i]);
-//     // }
-//
-//     return tours;
-// }
 
 exports.getAllTours = async (filter) => {
     if (!dbConfig.db.pool){
@@ -257,7 +224,6 @@ exports.createNewTour = async(tour) => {
 
     let request = dbConfig.db.pool.request();
     let result = await request
-        .input('id', sql.Int, tour.id)
         .input('name', sql.VarChar, tour.name)
         .input('duration', sql.Int, tour.duration)
         .input('maxGroupSize', sql.Int, tour.maxGroupSize)
@@ -269,12 +235,12 @@ exports.createNewTour = async(tour) => {
         .input('description', sql.VarChar, tour.description)
         .input('imageCover', sql.VarChar, tour.imageCover)
         .query('insert into Tours ' +
-            '(id, name, duration, maxGroupSize, difficulty, ratingsAverage, ratingsQuantity, price, summary, description, imageCover) ' +
+            '(name, duration, maxGroupSize, difficulty, ratingsAverage, ratingsQuantity, price, summary, description, imageCover) ' +
             'values ' +
-            '(@id, @name, @duration, @maxGroupSize, @difficulty, @ratingsAverage, @ratingsQuantity, @price, @summary, @description, @imageCover)');
+            '(@name, @duration, @maxGroupSize, @difficulty, @ratingsAverage, @ratingsQuantity, @price, @summary, @description, @imageCover)');
 
 
-    console.log(result);
+    // console.log(result);
     return result.recordsets;
 }
 
@@ -351,7 +317,9 @@ exports.addTourIfNotExisted = async (tour) => {
         .input('summary', sql.VarChar, tour.summary)
         .input('description', sql.VarChar, tour.description)
         .input('imageCover', sql.VarChar, tour.imageCover)
-        .query('insert into Tours ' +
+        .query(
+            'SET IDENTITY_INSERT Tours ON ' +
+            'insert into Tours ' +
             '(id, name, duration, maxGroupSize, difficulty, ratingsAverage, ratingsQuantity, price, summary, description, imageCover) ' +
             'SELECT @id, @name, @duration, @maxGroupSize, @difficulty, @ratingsAverage, @ratingsQuantity, @price, @summary, @description, @imageCover ' +
             'WHERE NOT EXISTS(SELECT * FROM Tours WHERE id = @id)');
