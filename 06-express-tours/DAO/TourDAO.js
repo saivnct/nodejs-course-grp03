@@ -94,8 +94,6 @@ exports.getAllTours = async (filter) => {
                     for (let criteriaOperator in filter[criteria]){
                         let operator;
                         let criterialVal;
-
-
                         if (criteriaOperator === 'gt'){
                             operator = '>'
                             criterialVal = filter[criteria]['gt'];
@@ -122,7 +120,8 @@ exports.getAllTours = async (filter) => {
                             j++;
                         }
                     }
-                }else{
+                }
+                else{
                     filterStr += criteria + ' = ' + filter[criteria];
                     i++;
                 }
@@ -198,7 +197,7 @@ exports.getAllTours = async (filter) => {
         pageSize,
         totalPage,
         totalItem,
-        tours: tours
+        tours
     };
 }
 
