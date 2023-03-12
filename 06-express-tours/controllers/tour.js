@@ -125,26 +125,24 @@ exports.createNewTour = async (req,res) => {
     console.log('createNewTour', req.body);
     const newTour = req.body;
     try {
-        const lastId = await TourDAO.checkLastId();
-        newTour.id = lastId + 1;
-
         await TourDAO.createNewTour(newTour);
+        let tour = await TourDAO.getTourByName(newTour.name);
 
         if (newTour.images && newTour.images.length > 0){
             for (let j = 0; j < newTour.images.length; j++) {
-                await TourImageDAO.addTourImageIfNotExisted(newTour.id, newTour.images[j]);
+                await TourImageDAO.addTourImageIfNotExisted(tour.id, newTour.images[j]);
             }
         }
 
         if (newTour.startDates && newTour.startDates.length > 0){
             for (let j = 0; j < newTour.startDates.length; j++) {
                 let date = new Date(newTour.startDates[j]);
-                await TourStartDateDAO.addTourStartDateIfNotExisted(newTour.id, date.toISOString());
+                await TourStartDateDAO.addTourStartDateIfNotExisted(tour.id, date.toISOString());
             }
         }
 
 
-        const tour = await TourDAO.getTourById(newTour.id);
+        tour = await TourDAO.getTourById(tour.id);
         return res
             .status(200)
             .json({
