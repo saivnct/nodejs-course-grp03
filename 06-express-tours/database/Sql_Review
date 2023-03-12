@@ -6,20 +6,7 @@ create table Reviews
     id          int primary key      not null,
     review      varchar(max)         not null,
     rating      float CHECK (rating >= 0 AND rating <= 5),
+    tourId    int foreign key references Tours (id) not  null,
+    userId    int foreign key references Users (id) not null,
 )
 
-use Tour_ad
-go
-create table ReviewUser
-(
-   reviewId    int foreign key references Reviews(id) not null,
-   userId      int foreign key references Users(id),
-)
-
-use Tour_ad
-go
-create table ReviewTour
-(
-   reviewId    int foreign key references Reviews(id) not null,
-   tourId      int foreign key references ToursAd(id) unique
-)

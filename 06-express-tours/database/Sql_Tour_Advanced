@@ -56,11 +56,10 @@ use Tour_ad
 go
 create table Locations(
     locationId      int primary key     not null,
-    day             int                 not null unique,
     description     varchar(200)        not null,
     type            varchar(200)        not null,
-    coordinate_x    int                 not null,
-    coordinate_y    int                 not null,
+    coordinate_x    float                 not null,
+    coordinate_y    float                 not null,
     address         varchar(200)
 )
 
@@ -70,6 +69,7 @@ create table TourAdLocations
 (
     tourId int foreign key references ToursAd(id) not null,
     locationId int foreign key references Locations(locationId) not null,
+    day             int                 not null unique,
 )
 
 -- INSERT DATA INTO TABLE -----------------------------------------

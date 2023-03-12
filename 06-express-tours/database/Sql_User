@@ -7,26 +7,16 @@ create table Users
     userName    varchar(200)         not null unique,
     name        varchar(200)         not null,
     email       varchar(200)         not null,
-    role        varchar(200)         not null,
     active      int CHECK (active = 0 OR active = 1) not null,
     photo       varchar(200)         not null,
     password    varchar(max)         not null,
-
+    role int foreign key references Roles(id) not null,
 )
 
 use Tour_ad
 go
-create table Role
+create table Roles
 (
    id    int primary key not null,
    role  varchar(200) not null unique,
 )
-
-use Tour_ad
-go
-create table UserRole
-(
-    userId    int foreign key references Users(id) not null unique,
-    roleId    int foreign key references Role(id) not null unique,
-)
-
