@@ -1,9 +1,7 @@
 const sql = require("mssql");
 
 class ModelSchemaValidator {
-    constructor(
-        config,
-    ) {
+    constructor(config) {
         this.name = config.name;
         this.sqlType = config.sqlType;
         switch (config.sqlType) {

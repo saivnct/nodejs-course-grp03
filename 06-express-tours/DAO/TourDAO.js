@@ -2,6 +2,7 @@ const dbConfig = require('./../database/dbconfig');
 const sql = require('mssql');
 const TourImageDAO = require('./TourImageDAO');
 const TourStartDateDAO = require('./TourStartDateDAO');
+const TourSchema = require('./../model/Tour');
 
 async function setTourInfo(tour){
     const tourImages = await TourImageDAO.getByTourId(tour.id);
@@ -177,8 +178,8 @@ exports.getTourById = async (id) => {
     let request = dbConfig.db.pool.request();
 
     let result = await request
-        .input('id', sql.Int, id)
-        .query('select * from Tours where id = @id');
+        .input(`${TourSchema.schema.id.name}`, TourSchema.schema.id.sqlType, id)
+        .query(`select * from ${TourSchema.schemaName} where ${TourSchema.schema.id.name} = @${TourSchema.schema.id.name}`);
 
     const tour = await setTourInfo(result.recordsets[0][0]);
     return tour;
@@ -192,8 +193,8 @@ exports.getTourByName = async (name) => {
     let request = dbConfig.db.pool.request();
 
     let result = await request
-        .input('name', sql.VarChar, name)
-        .query('select * from Tours where name = @name');
+        .input(`${TourSchema.schema.name.name}`, TourSchema.schema.name.sqlType, name)
+        .query(`select * from ${TourSchema.schemaName} where ${TourSchema.schema.name.name} = @${TourSchema.schema.name.name}`);
 
     // console.log(result);
 
@@ -206,8 +207,8 @@ exports.deleteTourById = async (id) => {
     }
     let request = dbConfig.db.pool.request();
     let result = await request
-        .input('id', sql.Int, id)
-        .query('delete Tours where id = @id')
+        .input(`${TourSchema.schema.id.name}`, TourSchema.schema.id.sqlType, id)
+        .query(`delete ${TourSchema.schemaName} where ${TourSchema.schema.id.name} = @${TourSchema.schema.id.name}`)
 
     // console.log(result);
     return result.recordsets;
@@ -234,7 +235,7 @@ exports.createNewTour = async(tour) => {
         .input('summary', sql.VarChar, tour.summary)
         .input('description', sql.VarChar, tour.description)
         .input('imageCover', sql.VarChar, tour.imageCover)
-        .query('insert into Tours ' +
+        .query(`insert into ${TourSchema.schemaName} ` +
             '(name, duration, maxGroupSize, difficulty, ratingsAverage, ratingsQuantity, price, summary, description, imageCover) ' +
             'values ' +
             '(@name, @duration, @maxGroupSize, @difficulty, @ratingsAverage, @ratingsQuantity, @price, @summary, @description, @imageCover)');
@@ -256,7 +257,7 @@ exports.updateTourById = async (id, updateInfo) => {
     let request = dbConfig.db.pool.request();
     request.input('id', sql.Int, id);
 
-    let query = 'update Tours set';
+    let query = `update ${TourSchema.schemaName} set`;
 
     if (updateInfo.name){
         request.input('name', sql.VarChar, updateInfo.name);
@@ -291,7 +292,7 @@ exports.clearAll = async () => {
         throw new Error('Not connected to db');
     }
 
-    let result = await dbConfig.db.pool.request().query(`delete Tours`);
+    let result = await dbConfig.db.pool.request().query(`delete ${TourSchema.schemaName}`);
 
     // console.log(result);
     return result.recordsets;
@@ -318,11 +319,11 @@ exports.addTourIfNotExisted = async (tour) => {
         .input('description', sql.VarChar, tour.description)
         .input('imageCover', sql.VarChar, tour.imageCover)
         .query(
-            'SET IDENTITY_INSERT Tours ON ' +
-            'insert into Tours ' +
+            `SET IDENTITY_INSERT ${TourSchema.schemaName} ON ` +
+            `insert into ${TourSchema.schemaName} ` +
             '(id, name, duration, maxGroupSize, difficulty, ratingsAverage, ratingsQuantity, price, summary, description, imageCover) ' +
             'SELECT @id, @name, @duration, @maxGroupSize, @difficulty, @ratingsAverage, @ratingsQuantity, @price, @summary, @description, @imageCover ' +
-            'WHERE NOT EXISTS(SELECT * FROM Tours WHERE id = @id)');
+            `WHERE NOT EXISTS(SELECT * FROM ${TourSchema.schemaName} WHERE id = @id)`);
     // console.log(result);
     return result.recordsets;
 }
