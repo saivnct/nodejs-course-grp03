@@ -1,5 +1,4 @@
 const dbConfig = require('./../database/dbconfig');
-const sql = require('mssql');
 const TourImageDAO = require('./TourImageDAO');
 const TourStartDateDAO = require('./TourStartDateDAO');
 const TourSchema = require('./../model/Tour');
@@ -14,14 +13,12 @@ async function setTourInfo(tour){
     return tour
 }
 
-
-
 exports.getAllTours = async (filter) => {
     if (!dbConfig.db.pool){
         throw new Error('Not connected to db');
     }
-    let query = `SELECT * from Tours`
-    let countQuery = `SELECT COUNT(DISTINCT id) as totalItem from Tours`
+    let query = `SELECT * from ${TourSchema.schemaName}`;
+    let countQuery = `SELECT COUNT(DISTINCT ${TourSchema.schema.id.name}) as totalItem from ${TourSchema.schemaName}`;
 
     const page = filter.page * 1 || 1;
     let pageSize = filter.pageSize * 1 || 10;
@@ -30,7 +27,7 @@ exports.getAllTours = async (filter) => {
     }
     const skip = (page - 1) * pageSize;
     let paginationStr = 'ORDER BY';
-    let defaultSortStr = `createdAt asc`;
+    let defaultSortStr = `${TourSchema.defaultSort} asc`;
     let sortStr = '';
 
     const sort = filter.sort;
@@ -50,12 +47,12 @@ exports.getAllTours = async (filter) => {
             }
 
             if (
-                criteria === 'id' ||
-                criteria === 'duration' ||
-                criteria === 'maxGroupSize' ||
-                criteria === 'ratingsAverage' ||
-                criteria === 'ratingsQuantity' ||
-                criteria === 'price'
+                criteria === TourSchema.schema.id.name ||
+                criteria === TourSchema.schema.duration.name ||
+                criteria === TourSchema.schema.maxGroupSize.name ||
+                criteria === TourSchema.schema.ratingsAverage.name ||
+                criteria === TourSchema.schema.ratingsQuantity.name ||
+                criteria === TourSchema.schema.price.name
             ){
                 if (typeof filter[criteria] === 'object'){
                     let j = 0;
@@ -94,8 +91,8 @@ exports.getAllTours = async (filter) => {
                     i++;
                 }
             }else if (
-                criteria === 'name' ||
-                criteria === 'difficulty'
+                criteria === TourSchema.schema.name.name ||
+                criteria === TourSchema.schema.difficulty.name
             ){
                 filterStr += criteria + " = '" + filter[criteria] + "'";
                 i++;
@@ -169,7 +166,6 @@ exports.getAllTours = async (filter) => {
     };
 }
 
-
 exports.getTourById = async (id) => {
     if (!dbConfig.db.pool){
         throw new Error('Not connected to db');
@@ -225,20 +221,22 @@ exports.createNewTour = async(tour) => {
 
     let request = dbConfig.db.pool.request();
     let result = await request
-        .input('name', sql.VarChar, tour.name)
-        .input('duration', sql.Int, tour.duration)
-        .input('maxGroupSize', sql.Int, tour.maxGroupSize)
-        .input('difficulty', sql.VarChar, tour.difficulty)
-        .input('ratingsAverage', sql.Float, tour.ratingsAverage)
-        .input('ratingsQuantity', sql.Int, tour.ratingsQuantity)
-        .input('price', sql.Int, tour.price)
-        .input('summary', sql.VarChar, tour.summary)
-        .input('description', sql.VarChar, tour.description)
-        .input('imageCover', sql.VarChar, tour.imageCover)
+        .input(`${TourSchema.schema.name.name}`, TourSchema.schema.name.sqlType, tour.name)
+        .input(`${TourSchema.schema.duration.name}`, TourSchema.schema.duration.sqlType, tour.duration)
+        .input(`${TourSchema.schema.maxGroupSize.name}`, TourSchema.schema.maxGroupSize.sqlType, tour.maxGroupSize)
+        .input(`${TourSchema.schema.difficulty.name}`, TourSchema.schema.difficulty.sqlType, tour.difficulty)
+        .input(`${TourSchema.schema.ratingsAverage.name}`, TourSchema.schema.ratingsAverage.sqlType, tour.ratingsAverage)
+        .input(`${TourSchema.schema.ratingsQuantity.name}`, TourSchema.schema.ratingsQuantity.sqlType, tour.ratingsQuantity)
+        .input(`${TourSchema.schema.price.name}`,TourSchema.schema.price.sqlType, tour.price)
+        .input(`${TourSchema.schema.summary.name}`, TourSchema.schema.summary.sqlType, tour.summary)
+        .input(`${TourSchema.schema.description.name}`, TourSchema.schema.description.sqlType, tour.description)
+        .input(`${TourSchema.schema.imageCover.name}`, TourSchema.schema.imageCover.sqlType, tour.imageCover)
         .query(`insert into ${TourSchema.schemaName} ` +
-            '(name, duration, maxGroupSize, difficulty, ratingsAverage, ratingsQuantity, price, summary, description, imageCover) ' +
-            'values ' +
-            '(@name, @duration, @maxGroupSize, @difficulty, @ratingsAverage, @ratingsQuantity, @price, @summary, @description, @imageCover)');
+            `(${TourSchema.schema.name.name}, ${TourSchema.schema.duration.name}, ${TourSchema.schema.maxGroupSize.name}, 
+            ${TourSchema.schema.difficulty.name}, ${TourSchema.schema.ratingsAverage.name}, ${TourSchema.schema.ratingsQuantity.name}, ${TourSchema.schema.price.name}, ${TourSchema.schema.summary.name}, ${TourSchema.schema.description.name}, ${TourSchema.schema.imageCover.name}) ` +
+            `values ` +
+            `(@${TourSchema.schema.name.name}, @${TourSchema.schema.duration.name}, @${TourSchema.schema.maxGroupSize.name}, 
+            @${TourSchema.schema.difficulty.name}, @${TourSchema.schema.ratingsAverage.name}, @${TourSchema.schema.ratingsQuantity.name}, @${TourSchema.schema.price.name}, @${TourSchema.schema.summary.name}, @${TourSchema.schema.description.name}, @${TourSchema.schema.imageCover.name})`);
 
 
     // console.log(result);
@@ -255,28 +253,33 @@ exports.updateTourById = async (id, updateInfo) => {
     }
 
     let request = dbConfig.db.pool.request();
-    request.input('id', sql.Int, id);
+    request.input(`${TourSchema.schema.id.name}`, TourSchema.schema.id.sqlType, id);
 
     let query = `update ${TourSchema.schemaName} set`;
 
     if (updateInfo.name){
-        request.input('name', sql.VarChar, updateInfo.name);
-        query += ' name = @name,';
+        request.input(`${TourSchema.schema.name.name}`, TourSchema.schema.name.sqlType, updateInfo.name);
+        query += ` ${TourSchema.schema.name.name} = @${TourSchema.schema.name.name},`;
     }
 
     if (typeof updateInfo.price === 'number' && updateInfo.price >= 0){
-        request.input('price', sql.Int, updateInfo.price);
-        query += ' price = @price,';
+        request.input(`${TourSchema.schema.price.name}`, TourSchema.schema.price.sqlType, updateInfo.price);
+        query += ` ${TourSchema.schema.price.name} = @${TourSchema.schema.price.name},`;
     }
 
-    if (typeof updateInfo.rating === 'number' && updateInfo.rating >= 0 && updateInfo.rating <= 5){
-        request.input('rating', sql.Float, updateInfo.rating);
-        query += ' rating = @rating,';
+    if (typeof updateInfo.ratingsAverage === 'number' && updateInfo.ratingsAverage >= 0 && updateInfo.ratingsAverage <= 5){
+        request.input(`${TourSchema.schema.ratingsAverage.name}`, TourSchema.schema.ratingsAverage.sqlType, updateInfo.ratingsAverage);
+        query += ` ${TourSchema.schema.ratingsAverage.name} = @${TourSchema.schema.ratingsAverage.name},`;
+    }
+
+    if (typeof updateInfo.ratingsQuantity === 'number' && updateInfo.ratingsQuantity >= 0){
+        request.input(`${TourSchema.schema.ratingsQuantity.name}`, TourSchema.schema.ratingsQuantity.sqlType, updateInfo.ratingsQuantity);
+        query += ` ${TourSchema.schema.ratingsQuantity.name} = @${TourSchema.schema.ratingsQuantity.name},`;
     }
 
     query = query.slice(0, -1); //receive query without last character ','
 
-    query += ' where id = @id'
+    query += ` where ${TourSchema.schema.id.name} = @${TourSchema.schema.id.name}`
 
     console.log(query);
 
@@ -307,23 +310,24 @@ exports.addTourIfNotExisted = async (tour) => {
     }
     let request = dbConfig.db.pool.request()
     let result = await request
-        .input('id', sql.Int, tour.id)
-        .input('name', sql.VarChar, tour.name)
-        .input('duration', sql.Int, tour.duration)
-        .input('maxGroupSize', sql.Int, tour.maxGroupSize)
-        .input('difficulty', sql.VarChar, tour.difficulty)
-        .input('ratingsAverage', sql.Float, tour.ratingsAverage)
-        .input('ratingsQuantity', sql.Int, tour.ratingsQuantity)
-        .input('price', sql.Int, tour.price)
-        .input('summary', sql.VarChar, tour.summary)
-        .input('description', sql.VarChar, tour.description)
-        .input('imageCover', sql.VarChar, tour.imageCover)
+        .input(`${TourSchema.schema.name.name}`, TourSchema.schema.name.sqlType, tour.name)
+        .input(`${TourSchema.schema.duration.name}`, TourSchema.schema.duration.sqlType, tour.duration)
+        .input(`${TourSchema.schema.maxGroupSize.name}`, TourSchema.schema.maxGroupSize.sqlType, tour.maxGroupSize)
+        .input(`${TourSchema.schema.difficulty.name}`, TourSchema.schema.difficulty.sqlType, tour.difficulty)
+        .input(`${TourSchema.schema.ratingsAverage.name}`, TourSchema.schema.ratingsAverage.sqlType, tour.ratingsAverage)
+        .input(`${TourSchema.schema.ratingsQuantity.name}`, TourSchema.schema.ratingsQuantity.sqlType, tour.ratingsQuantity)
+        .input(`${TourSchema.schema.price.name}`,TourSchema.schema.price.sqlType, tour.price)
+        .input(`${TourSchema.schema.summary.name}`, TourSchema.schema.summary.sqlType, tour.summary)
+        .input(`${TourSchema.schema.description.name}`, TourSchema.schema.description.sqlType, tour.description)
+        .input(`${TourSchema.schema.imageCover.name}`, TourSchema.schema.imageCover.sqlType, tour.imageCover)
         .query(
             `SET IDENTITY_INSERT ${TourSchema.schemaName} ON ` +
             `insert into ${TourSchema.schemaName} ` +
-            '(id, name, duration, maxGroupSize, difficulty, ratingsAverage, ratingsQuantity, price, summary, description, imageCover) ' +
-            'SELECT @id, @name, @duration, @maxGroupSize, @difficulty, @ratingsAverage, @ratingsQuantity, @price, @summary, @description, @imageCover ' +
-            `WHERE NOT EXISTS(SELECT * FROM ${TourSchema.schemaName} WHERE id = @id)`);
+            `(${TourSchema.schema.name.name}, ${TourSchema.schema.duration.name}, ${TourSchema.schema.maxGroupSize.name}, 
+            ${TourSchema.schema.difficulty.name}, ${TourSchema.schema.ratingsAverage.name}, ${TourSchema.schema.ratingsQuantity.name}, ${TourSchema.schema.price.name}, ${TourSchema.schema.summary.name}, ${TourSchema.schema.description.name}, ${TourSchema.schema.imageCover.name}) ` +
+            `SELECT @${TourSchema.schema.name.name}, @${TourSchema.schema.duration.name}, @${TourSchema.schema.maxGroupSize.name}, 
+            @${TourSchema.schema.difficulty.name}, @${TourSchema.schema.ratingsAverage.name}, @${TourSchema.schema.ratingsQuantity.name}, @${TourSchema.schema.price.name}, @${TourSchema.schema.summary.name}, @${TourSchema.schema.description.name}, @${TourSchema.schema.imageCover.name} ` +
+            `WHERE NOT EXISTS(SELECT * FROM ${TourSchema.schemaName} WHERE ${TourSchema.schema.id.name} = @${TourSchema.schema.id.name})`);
     // console.log(result);
     return result.recordsets;
 }
