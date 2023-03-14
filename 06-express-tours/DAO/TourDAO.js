@@ -310,6 +310,7 @@ exports.addTourIfNotExisted = async (tour) => {
     }
     let request = dbConfig.db.pool.request()
     let result = await request
+        .input(`${TourSchema.schema.id.name}`, TourSchema.schema.id.sqlType, tour.id)
         .input(`${TourSchema.schema.name.name}`, TourSchema.schema.name.sqlType, tour.name)
         .input(`${TourSchema.schema.duration.name}`, TourSchema.schema.duration.sqlType, tour.duration)
         .input(`${TourSchema.schema.maxGroupSize.name}`, TourSchema.schema.maxGroupSize.sqlType, tour.maxGroupSize)
@@ -323,9 +324,9 @@ exports.addTourIfNotExisted = async (tour) => {
         .query(
             `SET IDENTITY_INSERT ${TourSchema.schemaName} ON ` +
             `insert into ${TourSchema.schemaName} ` +
-            `(${TourSchema.schema.name.name}, ${TourSchema.schema.duration.name}, ${TourSchema.schema.maxGroupSize.name}, 
+            `(${TourSchema.schema.id.name}, ${TourSchema.schema.name.name}, ${TourSchema.schema.duration.name}, ${TourSchema.schema.maxGroupSize.name}, 
             ${TourSchema.schema.difficulty.name}, ${TourSchema.schema.ratingsAverage.name}, ${TourSchema.schema.ratingsQuantity.name}, ${TourSchema.schema.price.name}, ${TourSchema.schema.summary.name}, ${TourSchema.schema.description.name}, ${TourSchema.schema.imageCover.name}) ` +
-            `SELECT @${TourSchema.schema.name.name}, @${TourSchema.schema.duration.name}, @${TourSchema.schema.maxGroupSize.name}, 
+            `SELECT @${TourSchema.schema.id.name}, @${TourSchema.schema.name.name}, @${TourSchema.schema.duration.name}, @${TourSchema.schema.maxGroupSize.name}, 
             @${TourSchema.schema.difficulty.name}, @${TourSchema.schema.ratingsAverage.name}, @${TourSchema.schema.ratingsQuantity.name}, @${TourSchema.schema.price.name}, @${TourSchema.schema.summary.name}, @${TourSchema.schema.description.name}, @${TourSchema.schema.imageCover.name} ` +
             `WHERE NOT EXISTS(SELECT * FROM ${TourSchema.schemaName} WHERE ${TourSchema.schema.id.name} = @${TourSchema.schema.id.name})`);
     // console.log(result);
