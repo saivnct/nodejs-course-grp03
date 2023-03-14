@@ -111,8 +111,8 @@ exports.getFilterQuery = (schema, filter, page, pageSize, defaultSort) => {
 
 
     return {
-        filterStr,
-        paginationStr
+        where: filterStr,
+        pagination: paginationStr
     };
 }
 
